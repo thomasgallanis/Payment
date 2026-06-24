@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Checkout — €200.00</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── Layout ── */
+.page{min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:64px 24px;}
+.inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.col-left{display:flex;flex-direction:column;gap:32px;}
+.col-right{display:flex;flex-direction:column;gap:28px;}
+
+/* ── Order summary ── */
+.order-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#999;margin-bottom:10px;}
+.order-amount{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:6px;}
+.order-purpose{font-size:15px;color:#666;}
+.summary-card{background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:24px;display:flex;flex-direction:column;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:14px;color:#444;border-bottom:1px solid #f0f0f0;}
+.summary-row:first-child{padding-top:0;}
+.summary-row .lc{color:#666;}
+.summary-row .vc{font-weight:500;color:#222;}
+.summary-total{display:flex;justify-content:space-between;align-items:center;padding-top:16px;margin-top:4px;font-size:16px;font-weight:700;}
+.promo-wrap{padding:16px 0;display:flex;gap:10px;}
+.promo-wrap input{flex:1;height:40px;border:1px solid #ddd;border-radius:6px;padding:0 12px;font-family:inherit;font-size:14px;color:#222;outline:none;background:#fafafa;transition:border-color .15s;}
+.promo-wrap input:focus{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
+.promo-wrap input::placeholder{color:#aaa;}
+.btn-promo{height:40px;padding:0 18px;background:#fff;color:#222;border:1px solid #ddd;border-radius:6px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.btn-promo:hover{background:#f5f5f5;}
+.btn-promo.applied{color:#1a7f3c;border-color:#1a7f3c;}
+.secure-note{display:flex;align-items:center;gap:8px;font-size:13px;color:#999;}
+
+/* ── Inputs & fields ── */
+.section-title{font-size:18px;font-weight:600;margin-bottom:16px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label,.flabel{font-size:13px;font-weight:500;color:#444;}
+.inp{height:44px;border:1px solid #ddd;border-radius:6px;padding:0 14px;font-family:inherit;font-size:14px;color:#222;background:#fff;outline:none;width:100%;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+.inp:focus{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
+.inp::placeholder{color:#bbb;}
+.inp.error{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.1);}
+.inp.valid{border-color:#38a169;}
+.fields-stack{display:flex;flex-direction:column;gap:12px;}
+.select-wrap{position:relative;}
+.select-wrap select{height:44px;border:1px solid #ddd;border-radius:6px;padding:0 36px 0 14px;font-family:inherit;font-size:14px;color:#222;background:#fff;outline:none;width:100%;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.select-wrap select:focus{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
+.select-wrap::after{content:'';pointer-events:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top-color:#888;margin-top:3px;}
+.err-msg{font-size:12px;color:#e53e3e;margin-top:3px;display:none;}
+.err-msg.show{display:block;}
+
+/* ── Google Pay ── */
+.gpay-btn{width:100%;height:52px;background:#000;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.gpay-btn:hover{background:#111;}
+.gpay-btn svg{height:24px;width:auto;}
+.or-divider{display:flex;align-items:center;gap:12px;font-size:13px;color:#999;font-weight:500;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:#e5e5e5;}
+
+/* ── Tabs ── */
+.tabs-nav{display:flex;border:1px solid #ddd;border-radius:6px;overflow:hidden;margin-bottom:16px;}
+.tab-btn{flex:1;height:44px;border:none;background:#fafafa;font-family:inherit;font-size:13px;font-weight:500;color:#666;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;border-right:1px solid #ddd;transition:background .12s,color .12s;}
+.tab-btn:last-child{border-right:none;}
+.tab-btn.active{background:#fff;color:#222;font-weight:600;}
+.tab-btn svg{width:15px;height:15px;flex-shrink:0;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── Card frame (Stripe-style) ── */
+.card-frame{border:1px solid #ddd;border-radius:6px;overflow:hidden;transition:border-color .15s,box-shadow .15s;}
+.card-frame.focused{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
+.card-frame.error{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.1);}
+.card-number-row{display:flex;align-items:center;border-bottom:1px solid #e5e5e5;padding:0 14px;background:#fff;height:44px;gap:10px;}
+.card-number-row input{flex:1;border:none!important;box-shadow:none!important;height:100%;padding:0;font-size:14px;color:#222;background:transparent;outline:none;font-family:inherit;letter-spacing:.06em;}
+.card-number-row input::placeholder{color:#bbb;letter-spacing:0;}
+.card-brands{display:flex;gap:4px;align-items:center;flex-shrink:0;}
+.card-brands svg{transition:opacity .2s;}
+.card-brands svg.dim{opacity:.25;}
+.card-brands svg.detected{opacity:1;}
+.card-bottom-row{display:grid;grid-template-columns:1fr 1fr;}
+.half-input{display:flex;align-items:center;height:44px;padding:0 14px;background:#fff;}
+.half-input:first-child{border-right:1px solid #e5e5e5;}
+.half-input input{border:none!important;box-shadow:none!important;width:100%;height:100%;font-family:inherit;font-size:14px;color:#222;background:transparent;outline:none;}
+.half-input input::placeholder{color:#bbb;}
+.cvc-wrap{display:flex;align-items:center;width:100%;}
+.cvc-wrap input{flex:1;border:none!important;box-shadow:none!important;height:100%;font-family:inherit;font-size:14px;color:#222;background:transparent;outline:none;}
+.cvc-wrap input::placeholder{color:#bbb;}
+.cvc-icon{color:#ccc;flex-shrink:0;margin-left:6px;}
+
+/* Card type badge */
+.card-type-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;margin-top:6px;transition:all .2s;}
+.badge-visa{background:#e8f0ff;color:#1434CB;}
+.badge-mc{background:#fff0f0;color:#EB001B;}
+.badge-maestro{background:#f0fff4;color:#276749;}
+.badge-unknown{background:#f5f5f5;color:#999;}
+
+/* ── IBAN panel ── */
+.iban-panel{display:flex;flex-direction:column;gap:8px;}
+.iban-panel input{height:44px;border:1px solid #ddd;border-radius:6px;padding:0 14px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;letter-spacing:.04em;color:#222;background:#fff;outline:none;width:100%;transition:border-color .15s,box-shadow .15s;}
+.iban-panel input:focus{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
+.iban-panel input.valid{border-color:#38a169;}
+.iban-panel input.error{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.1);}
+.iban-panel input::placeholder{color:#bbb;}
+.iban-note{font-size:12px;color:#999;}
+
+/* ── Wallet panels ── */
+.wallet-panel{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px;border:1px solid #e5e5e5;border-radius:6px;background:#fff;text-align:center;}
+.wallet-btn{width:220px;height:48px;background:#000;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.wallet-btn:hover{background:#111;}
+.wallet-btn svg{height:22px;width:auto;}
+.wallet-panel p{font-size:13px;color:#888;}
+
+/* ── Misc ── */
+.check-row{display:flex;align-items:center;gap:10px;font-size:13px;color:#444;cursor:pointer;}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:#0055ff;cursor:pointer;flex-shrink:0;}
+.badges{display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0;}
+.badge{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#999;}
+.badge svg{width:13px;height:13px;}
+
+/* ── Pay button ── */
+.btn-pay{width:100%;height:52px;background:#0055ff;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;transition:background .15s;position:relative;overflow:hidden;}
+.btn-pay:hover:not(:disabled){background:#0044cc;}
+.btn-pay:disabled{cursor:not-allowed;background:#aaa;}
+
+/* ── Processing overlay ── */
+.overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.spinner{width:52px;height:52px;border:3px solid #e5e5e5;border-top-color:#0055ff;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.processing-text{font-size:18px;font-weight:600;color:#222;}
+.processing-sub{font-size:14px;color:#666;}
+
+/* ── Success screen ── */
+.success-screen{display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:48px 24px;}
+.success-screen.show{display:flex;}
+.checkmark-circle{width:72px;height:72px;background:#f0fff4;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.checkmark-circle svg{width:36px;height:36px;}
+.success-title{font-size:24px;font-weight:700;color:#222;}
+.success-sub{font-size:15px;color:#666;max-width:340px;line-height:1.6;}
+.success-amount{font-size:36px;font-weight:700;color:#0055ff;margin:4px 0;}
+.success-id{font-size:12px;color:#999;font-family:'SF Mono',monospace;}
+.btn-done{margin-top:8px;height:48px;padding:0 32px;background:#0055ff;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-done:hover{background:#0044cc;}
+
+/* ── Validation tooltip ── */
+.field-wrap{position:relative;}
+
+/* ── Responsive ── */
+@media(max-width:900px){.inner{grid-template-columns:1fr;gap:40px;}.col-left{order:2;}.col-right{order:1;}.page{padding:32px 16px;}}
+@media(max-width:500px){.order-amount{font-size:40px;}.tab-btn{font-size:11px;gap:3px;}}
+</style>
+</head>
+<body>
+
+<!-- Processing overlay -->
+<div class="overlay" id="overlay">
+  <div id="overlayContent">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <div class="spinner" id="spinner"></div>
+      <div class="processing-text" id="overlayTitle">Processing payment…</div>
+      <div class="processing-sub" id="overlaySub">Please wait, do not close this page.</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="inner">
+
+    <!-- ═══ LEFT ═══ -->
+    <div class="col-left">
+      <div>
+        <div class="order-eyebrow">Order Summary</div>
+        <div class="order-amount">€200.00</div>
+        <div class="order-purpose">Funding the account</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="lc">Subtotal</span>
+          <span class="vc">€200.00</span>
+        </div>
+        <div class="promo-wrap">
+          <input type="text" id="promoInput" placeholder="Promotion code"/>
+          <button class="btn-promo" id="promoBtn" onclick="applyPromo()">Apply</button>
+        </div>
+        <div style="height:1px;background:#f0f0f0;"></div>
+        <div class="summary-total">
+          <span>Total Due</span>
+          <span id="totalAmount">€200.00</span>
+        </div>
+      </div>
+
+      <div class="secure-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Payments are secure and encrypted.
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT ═══ -->
+    <div class="col-right">
+
+      <!-- Google Pay -->
+      <button class="gpay-btn" type="button">
+        <svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#fff" d="M60.18 23.77v7.9h-2.51V12.2h6.65a6.01 6.01 0 0 1 4.27 1.66 5.43 5.43 0 0 1 1.74 4.1 5.4 5.4 0 0 1-1.74 4.13 5.94 5.94 0 0 1-4.27 1.68h-4.14zm0-9.06v6.55h4.17a3.39 3.39 0 0 0 2.53-1 3.22 3.22 0 0 0 1-2.23 3.35 3.35 0 0 0-2.53-1.02h-4.17zM79.37 18c1.84 0 3.29.49 4.35 1.47s1.59 2.33 1.59 4.05v8.15h-2.4v-1.84h-.1c-1.01 1.51-2.37 2.27-4.05 2.27a5.6 5.6 0 0 1-3.85-1.36 4.34 4.34 0 0 1-1.55-3.4 4.1 4.1 0 0 1 1.62-3.4 6.77 6.77 0 0 1 4.33-1.27 7.64 7.64 0 0 1 3.79.82v-.57a2.87 2.87 0 0 0-1.04-2.22 3.6 3.6 0 0 0-2.44-.92 3.9 3.9 0 0 0-3.36 1.76l-2.21-1.38A6.15 6.15 0 0 1 79.37 18zm-3.26 10.2a2.09 2.09 0 0 0 .87 1.7 3.24 3.24 0 0 0 2.03.67 4.22 4.22 0 0 0 2.98-1.23 3.82 3.82 0 0 0 1.31-2.88 5.37 5.37 0 0 0-3.38-.96 4.39 4.39 0 0 0-2.62.74 2.23 2.23 0 0 0-1.19 1.96zM100 18.37l-8.38 19.26h-2.59l3.11-6.74-5.52-12.52h2.73l3.99 9.61h.06l3.89-9.61H100z"/>
+          <path fill="#4285F4" d="M37.98 24.08c0-.77-.07-1.55-.2-2.31H22.65v4.37h8.6a7.33 7.33 0 0 1-3.18 4.81v3.98h5.15c3.01-2.77 4.76-6.86 4.76-10.85z"/>
+          <path fill="#34A853" d="M22.65 38.85c4.32 0 7.95-1.42 10.6-3.92l-5.16-3.98c-1.43.97-3.27 1.52-5.44 1.52-4.17 0-7.71-2.8-8.97-6.58H8.35v4.1a16.02 16.02 0 0 0 14.3 8.86z"/>
+          <path fill="#FBBC04" d="M13.68 25.89a9.55 9.55 0 0 1 0-6.1v-4.1H8.35a16 16 0 0 0 0 14.3l5.33-4.1z"/>
+          <path fill="#EA4335" d="M22.65 13.2a8.73 8.73 0 0 1 6.16 2.4l4.58-4.57A15.48 15.48 0 0 0 22.65 7 16.02 16.02 0 0 0 8.35 15.7l5.33 4.1c1.26-3.78 4.8-6.6 8.97-6.6z"/>
+        </svg>
+      </button>
+
+      <div class="or-divider">Or pay another way</div>
+
+      <!-- Shipping info -->
+      <div>
+        <div class="section-title">Shipping information</div>
+        <div class="fields-stack">
+          <div class="field">
+            <label for="email">Email</label>
+            <input class="inp" type="email" id="email" placeholder="you@example.com" oninput="validateEmail()"/>
+            <span class="err-msg" id="emailErr">Please enter a valid email address.</span>
+          </div>
+          <div>
+            <span class="flabel" style="display:block;margin-bottom:6px;">Shipping address</span>
+            <div class="fields-stack" style="gap:8px;">
+              <input class="inp" type="text" id="shipName" placeholder="Full Name" oninput="clearErr(this)"/>
+              <span class="err-msg" id="shipNameErr">Name is required.</span>
+              <div class="select-wrap">
+                <select id="country" class="inp" style="padding:0 36px 0 14px;">
+                  <option value="">Select country…</option>
+                  <option value="US">United States</option><option value="GB">United Kingdom</option>
+                  <option value="DE">Germany</option><option value="FR">France</option>
+                  <option value="IT">Italy</option><option value="ES">Spain</option>
+                  <option value="NL">Netherlands</option><option value="CA">Canada</option>
+                  <option value="AU">Australia</option><option value="JP">Japan</option>
+                  <option value="SG">Singapore</option><option value="CH">Switzerland</option>
+                  <option value="SE">Sweden</option><option value="NO">Norway</option>
+                  <option value="DK">Denmark</option><option value="PL">Poland</option>
+                  <option value="PT">Portugal</option><option value="AT">Austria</option>
+                  <option value="BE">Belgium</option><option value="FI">Finland</option>
+                  <option value="IE">Ireland</option>
+                </select>
+              </div>
+              <span class="err-msg" id="countryErr">Please select a country.</span>
+              <input class="inp" type="text" id="shipAddress" placeholder="Address" oninput="clearErr(this)"/>
+              <span class="err-msg" id="shipAddressErr">Address is required.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment method -->
+      <div>
+        <div class="section-title">Payment method</div>
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('card',this)" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>Card
+          </button>
+          <button class="tab-btn" onclick="switchTab('bank',this)" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Bank
+          </button>
+          <button class="tab-btn" onclick="switchTab('apple',this)" type="button">
+            <svg viewBox="0 0 814 1000" fill="currentColor"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105.5-57.9-155.5-127.4C46 790.8 0 663 0 541.8c0-207.9 132.4-318.3 261.8-318.3 71.2 0 130.3 45.5 173.8 45.5 41.8 0 107.5-48.1 185.5-48.1zM522.4 0c3.8 0 7.7.1 11.7.3-2.3 103.1-71.4 176.9-143.2 223-65.4 41.9-134.1 39.5-150.1 39.5C230.4 157.6 312.9 0 522.4 0z"/></svg>Apple Pay
+          </button>
+          <button class="tab-btn" onclick="switchTab('google',this)" type="button">
+            <svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:auto"><path fill="currentColor" d="M60.18 23.77v7.9h-2.51V12.2h6.65a6.01 6.01 0 0 1 4.27 1.66 5.43 5.43 0 0 1 1.74 4.1 5.4 5.4 0 0 1-1.74 4.13 5.94 5.94 0 0 1-4.27 1.68h-4.14zm0-9.06v6.55h4.17a3.39 3.39 0 0 0 2.53-1 3.22 3.22 0 0 0 1-2.23 3.35 3.35 0 0 0-2.53-1.02h-4.17zM79.37 18c1.84 0 3.29.49 4.35 1.47s1.59 2.33 1.59 4.05v8.15h-2.4v-1.84h-.1c-1.01 1.51-2.37 2.27-4.05 2.27a5.6 5.6 0 0 1-3.85-1.36 4.34 4.34 0 0 1-1.55-3.4 4.1 4.1 0 0 1 1.62-3.4 6.77 6.77 0 0 1 4.33-1.27 7.64 7.64 0 0 1 3.79.82v-.57a2.87 2.87 0 0 0-1.04-2.22 3.6 3.6 0 0 0-2.44-.92 3.9 3.9 0 0 0-3.36 1.76l-2.21-1.38A6.15 6.15 0 0 1 79.37 18zm-3.26 10.2a2.09 2.09 0 0 0 .87 1.7 3.24 3.24 0 0 0 2.03.67 4.22 4.22 0 0 0 2.98-1.23 3.82 3.82 0 0 0 1.31-2.88 5.37 5.37 0 0 0-3.38-.96 4.39 4.39 0 0 0-2.62.74 2.23 2.23 0 0 0-1.19 1.96zM100 18.37l-8.38 19.26h-2.59l3.11-6.74-5.52-12.52h2.73l3.99 9.61h.06l3.89-9.61H100z"/></svg>GPay
+          </button>
+        </div>
+
+        <!-- ── Card tab ── -->
+        <div id="tab-card" class="tab-panel active">
+          <div style="font-size:13px;font-weight:500;color:#444;margin-bottom:6px;">Card information</div>
+          <div class="card-frame" id="cardFrame">
+            <div class="card-number-row">
+              <input type="text" id="cardNumber" placeholder="1234 1234 1234 1234" maxlength="23"
+                oninput="onCardInput(this)" onfocus="cardFocus(true)" onblur="cardFocus(false)"/>
+              <div class="card-brands" id="cardBrands">
+                <!-- Visa -->
+                <svg id="brandVisa" viewBox="0 0 750 471" width="32" height="20" style="border-radius:3px;">
+                  <rect width="750" height="471" rx="40" fill="#1434CB"/>
+                  <path d="M278.2 334.4L311.5 137h52.2l-33.3 197.4H278.2zm234.8-192.6c-10.3-3.9-26.5-8.1-46.7-8.1-51.5 0-87.8 26-88 63.2-.2 27.5 25.8 42.8 45.5 52 20.2 9.4 27 15.4 26.9 23.8-.1 12.8-16.2 18.7-31.1 18.7-20.8 0-31.8-2.9-48.9-10L363.6 280l-7.6 44.7c12.7 5.6 36.1 10.5 60.4 10.7 57 0 94-26.7 94.4-68.1.2-22.7-14.2-40-45.2-54.2-18.8-9.2-30.3-15.4-30.2-24.7.1-8.3 9.7-17.1 30.8-17.1 17.5-.3 30.2 3.6 40.1 7.6l4.8 2.2 7.3-42.2zm135.8-4.8h-40.2c-12.4 0-21.8 3.4-27.2 15.8l-77.1 175.5h54.5l13.4-35.3H645l6.3 35.3h48.1L648.8 137zm-62.8 115.8l24.8-64.3 13.9 64.3H586zm-287.2-115.8l-51.1 134.6-5.4-26.5c-9.5-30.6-39-63.9-72.1-80.5l46.6 167.5 55 0 81.9-195.1h-55z" fill="#fff"/>
+                  <path d="M209.7 137h-84.2l-.7 3.9c65.6 15.9 109 54.2 127 100.3l-18.3-88c-3.2-12.2-12.4-15.8-24-16.2z" fill="#F9A51A"/>
+                </svg>
+                <!-- Mastercard -->
+                <svg id="brandMC" viewBox="0 0 152 95" width="28" height="18">
+                  <circle cx="55" cy="47.5" r="47.5" fill="#EB001B"/>
+                  <circle cx="97" cy="47.5" r="47.5" fill="#F79E1B"/>
+                  <path d="M76 16.5a47.5 47.5 0 0 1 0 62 47.5 47.5 0 0 1 0-62z" fill="#FF5F00"/>
+                </svg>
+                <!-- Maestro -->
+                <svg id="brandMaestro" viewBox="0 0 152 95" width="28" height="18">
+                  <circle cx="55" cy="47.5" r="47.5" fill="#009BE0"/>
+                  <circle cx="97" cy="47.5" r="47.5" fill="#009BE0"/>
+                  <path d="M76 16.5a47.5 47.5 0 0 1 0 62 47.5 47.5 0 0 1 0-62z" fill="#006AA7"/>
+                  <text x="76" y="56" text-anchor="middle" fill="#fff" font-size="18" font-weight="bold" font-family="Arial">M</text>
+                </svg>
+              </div>
+            </div>
+            <div class="card-bottom-row">
+              <div class="half-input">
+                <input type="text" id="cardExpiry" placeholder="MM / YY" maxlength="7"
+                  oninput="formatExpiry(this)" onfocus="cardFocus(true)" onblur="cardFocus(false)"/>
+              </div>
+              <div class="half-input">
+                <div class="cvc-wrap">
+                  <input type="text" id="cardCvc" placeholder="CVC" maxlength="4"
+                    oninput="this.value=this.value.replace(/\D/g,'')" onfocus="cardFocus(true)" onblur="cardFocus(false)"/>
+                  <svg class="cvc-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="cardTypeBadge" style="margin-top:8px;min-height:24px;"></div>
+          <span class="err-msg" id="cardErr">Please enter valid card details.</span>
+
+          <div class="check-row" style="margin-top:14px;">
+            <input type="checkbox" id="sameAddr" checked/>
+            <label for="sameAddr" style="cursor:pointer;">Billing address is same as shipping</label>
+          </div>
+        </div>
+
+        <!-- ── Bank / IBAN tab ── -->
+        <div id="tab-bank" class="tab-panel">
+          <div class="iban-panel">
+            <div style="font-size:13px;font-weight:500;color:#444;margin-bottom:4px;">IBAN</div>
+            <input type="text" id="ibanInput" placeholder="DE89 3704 0044 0532 0130 00"
+              oninput="onIbanInput(this)" maxlength="34"/>
+            <span class="err-msg" id="ibanErr">Please enter a valid IBAN.</span>
+            <div class="iban-note">By providing your IBAN, you authorize a debit via your payment provider.</div>
+          </div>
+        </div>
+
+        <!-- ── Apple Pay tab ── -->
+        <div id="tab-apple" class="tab-panel">
+          <div class="wallet-panel">
+            <button class="wallet-btn" onclick="handlePay()" type="button">
+              <svg viewBox="0 0 165 65" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#fff" d="M32.98 16.46c1.74-2.13 2.92-5.08 2.6-8.04-2.52.1-5.57 1.68-7.37 3.81-1.62 1.87-3.04 4.88-2.66 7.75 2.81.22 5.68-1.43 7.43-3.52zM35.53 20.53c-4.11-.24-7.6 2.33-9.55 2.33s-4.97-2.21-8.21-2.15C13.2 20.77 9 23.28 6.69 27.2c-4.64 8-1.22 19.84 3.3 26.35 2.21 3.23 4.86 6.82 8.35 6.7 3.3-.13 4.62-2.15 8.6-2.15 3.99 0 5.18 2.15 8.67 2.09 3.62-.06 5.89-3.29 8.1-6.53 2.53-3.73 3.58-7.35 3.64-7.54-.08-.04-6.97-2.72-7.03-10.65-.07-6.64 5.42-9.83 5.67-10-3.1-4.59-7.93-5.1-9.46-5.1zM62.58 9.75h9.39c7.7 0 13.07 5.32 13.07 13.05 0 7.73-5.46 13.1-13.24 13.1h-6.17V48H62.58V9.75zm7.22 22.23c5.36 0 8.39-2.9 8.39-7.15s-3.03-7.12-8.36-7.12H67.6v14.27h2.2zM87.07 40.54c0-4.29 3.28-6.93 9.12-7.26l6.7-.39V31.1c0-2.72-1.83-4.32-4.89-4.32-2.9 0-4.7 1.37-5.15 3.44h-4.79c.28-4.53 4.17-7.87 10.14-7.87 5.96 0 9.8 3.15 9.8 8.14V48h-4.65v-4.03h-.11c-1.37 2.72-4.37 4.42-7.51 4.42-4.73 0-8.09-2.94-8.09-7.34l.43-.51zm15.82-2.2v-1.88l-6.02.39c-2.96.19-4.65 1.46-4.65 3.5 0 2.08 1.74 3.4 4.4 3.4 3.44 0 6.27-2.37 6.27-5.41zM112.42 58.17c-1.63 0-3.22-.27-4.37-.68v-3.93c1.12.36 2.27.55 3.42.55 2.44 0 3.81-1.02 4.88-4.1l.42-1.32L107.93 23h5.1l5.89 18.93h.1l5.89-18.93h4.99l-9.28 26.28c-2.11 5.99-4.43 8.06-8.2 8.06V57.9z"/>
+              </svg>
+            </button>
+            <p>Authenticate with Touch ID or Face ID.</p>
+          </div>
+        </div>
+
+        <!-- ── Google Pay tab ── -->
+        <div id="tab-google" class="tab-panel">
+          <div class="wallet-panel">
+            <button class="wallet-btn" onclick="handlePay()" type="button">
+              <svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#fff" d="M60.18 23.77v7.9h-2.51V12.2h6.65a6.01 6.01 0 0 1 4.27 1.66 5.43 5.43 0 0 1 1.74 4.1 5.4 5.4 0 0 1-1.74 4.13 5.94 5.94 0 0 1-4.27 1.68h-4.14zm0-9.06v6.55h4.17a3.39 3.39 0 0 0 2.53-1 3.22 3.22 0 0 0 1-2.23 3.35 3.35 0 0 0-2.53-1.02h-4.17zM79.37 18c1.84 0 3.29.49 4.35 1.47s1.59 2.33 1.59 4.05v8.15h-2.4v-1.84h-.1c-1.01 1.51-2.37 2.27-4.05 2.27a5.6 5.6 0 0 1-3.85-1.36 4.34 4.34 0 0 1-1.55-3.4 4.1 4.1 0 0 1 1.62-3.4 6.77 6.77 0 0 1 4.33-1.27 7.64 7.64 0 0 1 3.79.82v-.57a2.87 2.87 0 0 0-1.04-2.22 3.6 3.6 0 0 0-2.44-.92 3.9 3.9 0 0 0-3.36 1.76l-2.21-1.38A6.15 6.15 0 0 1 79.37 18zm-3.26 10.2a2.09 2.09 0 0 0 .87 1.7 3.24 3.24 0 0 0 2.03.67 4.22 4.22 0 0 0 2.98-1.23 3.82 3.82 0 0 0 1.31-2.88 5.37 5.37 0 0 0-3.38-.96 4.39 4.39 0 0 0-2.62.74 2.23 2.23 0 0 0-1.19 1.96zM100 18.37l-8.38 19.26h-2.59l3.11-6.74-5.52-12.52h2.73l3.99 9.61h.06l3.89-9.61H100z"/>
+                <path fill="#4285F4" d="M37.98 24.08c0-.77-.07-1.55-.2-2.31H22.65v4.37h8.6a7.33 7.33 0 0 1-3.18 4.81v3.98h5.15c3.01-2.77 4.76-6.86 4.76-10.85z"/>
+                <path fill="#34A853" d="M22.65 38.85c4.32 0 7.95-1.42 10.6-3.92l-5.16-3.98c-1.43.97-3.27 1.52-5.44 1.52-4.17 0-7.71-2.8-8.97-6.58H8.35v4.1a16.02 16.02 0 0 0 14.3 8.86z"/>
+                <path fill="#FBBC04" d="M13.68 25.89a9.55 9.55 0 0 1 0-6.1v-4.1H8.35a16 16 0 0 0 0 14.3l5.33-4.1z"/>
+                <path fill="#EA4335" d="M22.65 13.2a8.73 8.73 0 0 1 6.16 2.4l4.58-4.57A15.48 15.48 0 0 0 22.65 7 16.02 16.02 0 0 0 8.35 15.7l5.33 4.1c1.26-3.78 4.8-6.6 8.97-6.6z"/>
+              </svg>
+            </button>
+            <p>Authenticate with your Google account.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges & Pay -->
+      <div class="badges">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>SSL Secured
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>PCI Compliant
+        </div>
+      </div>
+
+      <button class="btn-pay" id="payBtn" onclick="handlePay()" type="button">
+        Pay <span id="payAmount">€200.00</span>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───────────────────────────────────────────────
+   STATE
+─────────────────────────────────────────────── */
+var activeTab = 'card';
+var promoApplied = false;
+var payTotal = '€200.00';
+
+/* ───────────────────────────────────────────────
+   TABS
+─────────────────────────────────────────────── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  activeTab = id;
+}
+
+/* ───────────────────────────────────────────────
+   PROMO
+─────────────────────────────────────────────── */
+function applyPromo() {
+  var v = document.getElementById('promoInput').value.trim();
+  if (!v || promoApplied) return;
+  promoApplied = true;
+  payTotal = '€180.00';
+  document.getElementById('totalAmount').textContent = '€180.00';
+  document.getElementById('payAmount').textContent = '€180.00';
+  var b = document.getElementById('promoBtn');
+  b.textContent = '✓ Applied'; b.classList.add('applied');
+}
+
+/* ───────────────────────────────────────────────
+   CARD DETECTION  (Visa / Mastercard / Maestro)
+─────────────────────────────────────────────── */
+function detectCardType(num) {
+  var n = num.replace(/\s/g, '');
+  if (/^4/.test(n)) return 'visa';
+  if (/^(5[1-5]|2[2-7])/.test(n)) return 'mc';
+  // Maestro: 6304, 6759, 6761-6763, 676770, 676774
+  if (/^(6304|6759|676[123]|67677[04])/.test(n)) return 'maestro';
+  return '';
+}
+
+function onCardInput(el) {
+  // Keep only digits, group in 4s (Maestro can be 12-19 digits)
+  var digits = el.value.replace(/\D/g, '').slice(0, 19);
+  var grouped = digits.replace(/(.{4})/g, '$1 ').trim();
+  el.value = grouped;
+
+  var type = detectCardType(digits);
+  updateBrandDisplay(type);
+  updateCardBadge(type, digits);
+  hideErr('cardErr');
+  document.getElementById('cardFrame').classList.remove('error');
+}
+
+function updateBrandDisplay(type) {
+  var visa    = document.getElementById('brandVisa');
+  var mc      = document.getElementById('brandMC');
+  var maestro = document.getElementById('brandMaestro');
+  if (!type) {
+    // all normal
+    [visa, mc, maestro].forEach(function(s){ s.classList.remove('dim','detected'); });
+    return;
+  }
+  [visa, mc, maestro].forEach(function(s){ s.classList.add('dim'); s.classList.remove('detected'); });
+  var target = type === 'visa' ? visa : type === 'mc' ? mc : maestro;
+  target.classList.remove('dim'); target.classList.add('detected');
+}
+
+function updateCardBadge(type, digits) {
+  var el = document.getElementById('cardTypeBadge');
+  if (!type || digits.length < 4) { el.innerHTML = ''; return; }
+  var labels = { visa:'Visa', mc:'Mastercard', maestro:'Maestro' };
+  var classes = { visa:'badge-visa', mc:'badge-mc', maestro:'badge-maestro' };
+  el.innerHTML = '<span class="card-type-badge ' + classes[type] + '">' +
+    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+    labels[type] + ' detected</span>';
+}
+
+function cardFocus(on) {
+  document.getElementById('cardFrame').classList.toggle('focused', on);
+}
+
+function formatExpiry(el) {
+  var v = el.value.replace(/\D/g, '').slice(0, 4);
+  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+  el.value = v;
+}
+
+/* ───────────────────────────────────────────────
+   IBAN VALIDATION
+─────────────────────────────────────────────── */
+function onIbanInput(el) {
+  // Format: group of 4 chars separated by spaces
+  var raw = el.value.replace(/\s/g,'').toUpperCase().slice(0,34);
+  el.value = raw.replace(/(.{4})/g,'$1 ').trim();
+  var valid = validateIban(raw);
+  el.classList.toggle('valid', valid && raw.length >= 15);
+  el.classList.toggle('error', !valid && raw.length > 4);
+  if (valid || raw.length <= 4) hideErr('ibanErr');
+}
+
+function validateIban(iban) {
+  // Basic IBAN format: 2 letter country + 2 check digits + up to 30 alphanumeric
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(iban)) return false;
+  // Mod-97 check
+  var rearranged = iban.slice(4) + iban.slice(0,4);
+  var numeric = '';
+  for (var i = 0; i < rearranged.length; i++) {
+    var c = rearranged.charCodeAt(i);
+    numeric += c >= 65 ? (c - 55).toString() : rearranged[i];
+  }
+  var remainder = 0;
+  for (var j = 0; j < numeric.length; j++) {
+    remainder = (remainder * 10 + parseInt(numeric[j])) % 97;
+  }
+  return remainder === 1;
+}
+
+/* ───────────────────────────────────────────────
+   EMAIL VALIDATION
+─────────────────────────────────────────────── */
+function validateEmail() {
+  var el = document.getElementById('email');
+  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+  el.classList.toggle('error', !valid && el.value.length > 0);
+  el.classList.toggle('valid', valid);
+  if (valid) hideErr('emailErr');
+  return valid;
+}
+
+/* ───────────────────────────────────────────────
+   GENERIC HELPERS
+─────────────────────────────────────────────── */
+function clearErr(el) {
+  el.classList.remove('error');
+}
+function showErr(id) { document.getElementById(id).classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+
+/* ───────────────────────────────────────────────
+   FORM VALIDATION
+─────────────────────────────────────────────── */
+function validateAll() {
+  var ok = true;
+
+  // Email
+  var email = document.getElementById('email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('email').classList.add('error');
+    showErr('emailErr'); ok = false;
+  }
+
+  // Name
+  var name = document.getElementById('shipName').value.trim();
+  if (!name) {
+    document.getElementById('shipName').classList.add('error');
+    showErr('shipNameErr'); ok = false;
+  }
+
+  // Country
+  if (!document.getElementById('country').value) {
+    document.getElementById('country').classList.add('error');
+    showErr('countryErr'); ok = false;
+  }
+
+  // Address
+  var addr = document.getElementById('shipAddress').value.trim();
+  if (!addr) {
+    document.getElementById('shipAddress').classList.add('error');
+    showErr('shipAddressErr'); ok = false;
+  }
+
+  // Payment-tab specific
+  if (activeTab === 'card') {
+    var cardNum = document.getElementById('cardNumber').value.replace(/\s/g,'');
+    var expiry  = document.getElementById('cardExpiry').value.replace(/\s/g,'');
+    var cvc     = document.getElementById('cardCvc').value;
+    var type    = detectCardType(cardNum);
+    var cardLen = (type === 'maestro') ? cardNum.length >= 12 : cardNum.length === 16;
+    var expOk   = /^\d{2}\/\d{2}$/.test(document.getElementById('cardExpiry').value.replace(/\s/g,'').replace('/','/'));
+    var cvcOk   = cvc.length >= 3;
+    if (!cardLen || !expOk || !cvcOk || !type) {
+      document.getElementById('cardFrame').classList.add('error');
+      showErr('cardErr'); ok = false;
+    }
+  }
+
+  if (activeTab === 'bank') {
+    var ibanRaw = document.getElementById('ibanInput').value.replace(/\s/g,'').toUpperCase();
+    if (!validateIban(ibanRaw)) {
+      document.getElementById('ibanInput').classList.add('error');
+      showErr('ibanErr'); ok = false;
+    }
+  }
+
+  return ok;
+}
+
+/* ───────────────────────────────────────────────
+   PAY HANDLER
+─────────────────────────────────────────────── */
+function handlePay() {
+  if (!validateAll()) return;
+
+  // Show overlay
+  var overlay = document.getElementById('overlay');
+  overlay.classList.add('show');
+
+  // After 3 seconds → show success
+  setTimeout(function() {
+    // Replace spinner with success
+    document.getElementById('overlayContent').innerHTML =
+      '<div class="success-screen show">' +
+        '<div class="checkmark-circle">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+            '<polyline points="20 6 9 17 4 12"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="success-title">Payment Successful</div>' +
+        '<div class="success-amount">' + payTotal + '</div>' +
+        '<div class="success-sub">Thank you for your payment.<br>Your transaction has been confirmed.</div>' +
+        '<div class="success-id">Transaction ID: TXN-' + Math.random().toString(36).slice(2,10).toUpperCase() + '</div>' +
+        '<button class="btn-done" onclick="resetPage()">Done</button>' +
+      '</div>';
+  }, 3000);
+}
+
+/* ───────────────────────────────────────────────
+   RESET
+─────────────────────────────────────────────── */
+function resetPage() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('overlayContent').innerHTML =
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;">' +
+      '<div class="spinner" id="spinner"></div>' +
+      '<div class="processing-text">Processing payment…</div>' +
+      '<div class="processing-sub">Please wait, do not close this page.</div>' +
+    '</div>';
+}
+</script>
+</body>
+</html>
