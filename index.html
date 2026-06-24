@@ -3,17 +3,26 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Checkout — €200.00</title>
+<title>Checkout — Standard Swiss</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;min-height:100vh;-webkit-font-smoothing:antialiased;}
-.page{min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:64px 24px;}
+
+/* Header */
+.site-header{width:100%;background:#fff;border-bottom:1px solid #e5e5e5;padding:0 24px;}
+.site-header-inner{max-width:1100px;margin:0 auto;height:64px;display:flex;align-items:center;gap:12px;}
+.site-header img{height:36px;width:auto;display:block;}
+.site-header-name{font-size:17px;font-weight:700;color:#111;letter-spacing:-.02em;}
+
+.page{min-height:calc(100vh - 64px);display:flex;justify-content:center;align-items:flex-start;padding:56px 24px;}
 .inner{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
 .col-left{display:flex;flex-direction:column;gap:32px;}
 .col-right{display:flex;flex-direction:column;gap:28px;}
+
+/* Order summary */
 .order-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#999;margin-bottom:10px;}
 .order-amount{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:6px;}
 .order-purpose{font-size:15px;color:#666;}
@@ -31,6 +40,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .btn-promo:hover{background:#f5f5f5;}
 .btn-promo.applied{color:#1a7f3c;border-color:#1a7f3c;}
 .secure-note{display:flex;align-items:center;gap:8px;font-size:13px;color:#999;}
+
+/* Inputs */
 .section-title{font-size:18px;font-weight:600;margin-bottom:16px;}
 .field{display:flex;flex-direction:column;gap:6px;}
 .field label,.flabel{font-size:13px;font-weight:500;color:#444;}
@@ -47,6 +58,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .select-wrap::after{content:'';pointer-events:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top-color:#888;margin-top:3px;}
 .err-msg{font-size:12px;color:#e53e3e;margin-top:3px;display:none;}
 .err-msg.show{display:block;}
+
+/* Tabs */
 .tabs-nav{display:flex;border:1px solid #ddd;border-radius:6px;overflow:hidden;margin-bottom:16px;}
 .tab-btn{flex:1;height:48px;border:none;background:#fafafa;font-family:inherit;font-size:14px;font-weight:500;color:#666;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;border-right:1px solid #ddd;transition:background .12s,color .12s;}
 .tab-btn:last-child{border-right:none;}
@@ -54,6 +67,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .tab-btn svg{width:16px;height:16px;flex-shrink:0;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
+
+/* Card frame */
 .card-frame{border:1px solid #ddd;border-radius:6px;overflow:hidden;transition:border-color .15s,box-shadow .15s;}
 .card-frame.focused{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
 .card-frame.error{border-color:#e53e3e!important;box-shadow:0 0 0 3px rgba(229,62,62,.1)!important;}
@@ -77,6 +92,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .badge-visa{background:#e8f0ff;color:#1434CB;}
 .badge-mc{background:#fff0f0;color:#c53030;}
 .badge-maestro{background:#e6f7ff;color:#1565a0;}
+
+/* IBAN */
 .iban-panel{display:flex;flex-direction:column;gap:8px;}
 .iban-panel input{height:44px;border:1px solid #ddd;border-radius:6px;padding:0 14px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;letter-spacing:.05em;color:#222;background:#fff;outline:none;width:100%;transition:border-color .15s,box-shadow .15s;}
 .iban-panel input:focus{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.1);}
@@ -84,6 +101,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .iban-panel input.error{border-color:#e53e3e!important;box-shadow:0 0 0 3px rgba(229,62,62,.1)!important;}
 .iban-panel input::placeholder{color:#bbb;}
 .iban-note{font-size:12px;color:#999;line-height:1.5;}
+
+/* Misc */
 .check-row{display:flex;align-items:center;gap:10px;font-size:13px;color:#444;cursor:pointer;}
 .check-row input[type=checkbox]{width:16px;height:16px;accent-color:#0055ff;cursor:pointer;flex-shrink:0;}
 .badges{display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0;}
@@ -92,12 +111,16 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .btn-pay{width:100%;height:52px;background:#0055ff;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;transition:background .15s;}
 .btn-pay:hover:not(:disabled){background:#0044cc;}
 .btn-pay:disabled{cursor:not-allowed;background:#aaa;}
+
+/* Overlay */
 .overlay{position:fixed;inset:0;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .35s;}
 .overlay.show{opacity:1;pointer-events:all;}
 .spinner{width:56px;height:56px;border:3px solid #e5e5e5;border-top-color:#0055ff;border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .proc-title{font-size:20px;font-weight:600;color:#222;margin-top:20px;}
 .proc-sub{font-size:14px;color:#777;margin-top:6px;}
+
+/* Success */
 .success-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:32px;}
 .check-circle{width:76px;height:76px;background:#f0fff4;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275) both;}
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -107,12 +130,21 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 .txn-id{font-size:12px;color:#aaa;font-family:'SF Mono','Fira Code',monospace;margin-top:4px;}
 .btn-done{margin-top:12px;height:48px;padding:0 40px;background:#0055ff;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
 .btn-done:hover{background:#0044cc;}
+
 @media(max-width:900px){.inner{grid-template-columns:1fr;gap:40px;}.col-left{order:2;}.col-right{order:1;}.page{padding:32px 16px;}}
 @media(max-width:500px){.order-amount{font-size:40px;}}
 </style>
 </head>
 <body>
 
+<!-- Standard Swiss Header -->
+<header class="site-header">
+  <div class="site-header-inner">
+      <span class="site-header-name">Standard Swiss</span>
+  </div>
+</header>
+
+<!-- Overlay -->
 <div class="overlay" id="overlay">
   <div id="overlayBody">
     <div style="display:flex;flex-direction:column;align-items:center;">
@@ -126,7 +158,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
 <div class="page">
   <div class="inner">
 
-    <!-- LEFT -->
+    <!-- LEFT: Order Summary -->
     <div class="col-left">
       <div>
         <div class="order-eyebrow">Order Summary</div>
@@ -156,7 +188,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
       </div>
     </div>
 
-    <!-- RIGHT -->
+    <!-- RIGHT: Payment Form -->
     <div class="col-right">
 
       <!-- Shipping -->
@@ -200,7 +232,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
         </div>
       </div>
 
-      <!-- Payment — Card + Bank only -->
+      <!-- Payment method -->
       <div>
         <div class="section-title">Payment method</div>
         <div class="tabs-nav">
@@ -218,7 +250,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
           </button>
         </div>
 
-        <!-- Card tab -->
+        <!-- Card -->
         <div id="tab-card" class="tab-panel active">
           <div style="font-size:13px;font-weight:500;color:#444;margin-bottom:8px;">Card information</div>
           <div class="card-frame" id="cardFrame">
@@ -268,7 +300,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f7f7f7;color:#222;
           </div>
         </div>
 
-        <!-- Bank / IBAN tab -->
+        <!-- Bank / IBAN -->
         <div id="tab-bank" class="tab-panel">
           <div class="iban-panel">
             <div style="font-size:13px;font-weight:500;color:#444;margin-bottom:4px;">IBAN</div>
@@ -311,7 +343,6 @@ var activeTab = 'card';
 var promoApplied = false;
 var payTotal = '€200.00';
 
-/* Clear all fields on every page load — no credentials persist */
 window.addEventListener('load', function() {
   document.querySelectorAll('input, select').forEach(function(el) {
     if (el.type === 'checkbox') el.checked = el.defaultChecked;
